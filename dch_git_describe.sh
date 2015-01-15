@@ -1,0 +1,46 @@
+#!/bin/sh
+#
+# Set a `git describe` like version for the latest changelog entry
+# Copyright (C) 2014 Daniel Gollub
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
+[ ! -f debian/changelog ] && exit 1
+[ ! -d .git ] && [ -z "$GBP_GIT_DIR" ] && [ -z "$GIT_DIR" ] && exit 1
+
+PACKAGE=$(dpkg-parsechangelog | grep -E '^Source:'  | awk '{ print $2 }')
+VERSION=$(dpkg-parsechangelog | grep -E '^Version:' | awk '{ print $2 }')
+
+[ -z "$PACKAGE" ] && [ -z "$VERSION" ] && exit 1
+
+GIT_CMD="git"
+[ -n "$GBP_GIT_DIR" ] && GIT_CMD="$GIT_CMD --git-dir $GBP_GIT_DIR" 
+
+# Get the epoch from current changelog entry.
+# git-buildpackage git tags doesn't hold the epoch.
+EPOCH=$( echo $VERSION | sed 's/^\([0-9]*:\).*/\1/g' )
+GIT_DESCRIBE=$( $GIT_CMD describe --tags --match "debian/*" | 
+                sed 's,debian/,,' | sed 's/\(.*\)-\(.*\)-\(.*\)$/\1+\2+\3/g' )
+
+if [ -n "${GIT_DESCRIBE}" ]; then
+	NEW_VERSION="${EPOCH}${GIT_DESCRIBE}"
+else
+	NEW_VERSION="${VERSION}+$(date +%s)"
+fi
+
+sed -i "s/${PACKAGE} (${VERSION})/${PACKAGE} (${NEW_VERSION})/" \
+    debian/changelog
+
