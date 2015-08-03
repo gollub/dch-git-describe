@@ -3,7 +3,7 @@
 TESTBED=""
 
 run_dch() {
-	/bin/sh $TESTROOT/../dch_git_describe.sh
+	/bin/bash $TESTROOT/../dch_git_describe.sh
 }
 
 create_dch() {
@@ -15,7 +15,7 @@ git_init() {
 }
 
 sep_git_init() {
-	export GBP_GIT_DIR=$TESTBED/sepgit
+	export GBP_GIT_DIR=$TESTBED/sepgit/.git
 	mkdir sepgit
 	pushd sepgit > /dev/null
 	git_init

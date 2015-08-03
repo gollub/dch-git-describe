@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Set a `git describe` like version for the latest changelog entry
 # Copyright (C) 2014 Daniel Gollub
@@ -29,7 +29,7 @@ VERSION=$(dpkg-parsechangelog | grep -E '^Version:' | awk '{ print $2 }')
 GIT_CMD="git"
 [ -n "$GBP_GIT_DIR" ] && GIT_CMD="$GIT_CMD --git-dir $GBP_GIT_DIR" 
 
-$GIT_CMD status &> /dev/null || exit 1
+$GIT_CMD log -1 &> /dev/null || exit 1
 
 # Get the epoch from current changelog entry.
 # git-buildpackage git tags doesn't hold the epoch.
