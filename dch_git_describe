@@ -33,9 +33,16 @@ $GIT_CMD log -1 &> /dev/null || exit 1
 
 # Get the epoch from current changelog entry.
 # git-buildpackage git tags doesn't hold the epoch.
-EPOCH=$( echo $VERSION | sed 's/^\([0-9]*:\).*/\1/g' )
+EPOCH=""
+if echo $VERSION | grep -Eq '^[0-9]+:.*'; then
+	EPOCH=$( echo $VERSION | sed 's/^\([0-9]*:\).*/\1/g' )
+fi
+
+$GIT_CMD describe --tags --match "debian/*"
 GIT_DESCRIBE=$( $GIT_CMD describe --tags --match "debian/*" | 
-                sed 's,debian/,,' | sed 's/\(.*\)-\(.*\)-\(.*\)$/\1+\2+\3/g' )
+                sed 's,debian/,,' |
+                sed 's/\(.*\)-\(.*\)-\(.*\)$/\1+\2+\3/g' |
+                sed 's/^[0-9]*%//' )
 
 if [ -n "${GIT_DESCRIBE}" ]; then
 	NEW_VERSION="${EPOCH}${GIT_DESCRIBE}"

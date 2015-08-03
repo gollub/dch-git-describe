@@ -2,12 +2,20 @@
 
 TESTBED=""
 
+
+get_version() {
+	dpkg-parsechangelog 2> /dev/null | grep -E '^Version:' | awk '{ print $2 }'
+}
+
 run_dch() {
-	/bin/bash $TESTROOT/../dch_git_describe
+	/bin/bash -x $TESTROOT/../dch_git_describe
 }
 
 create_dch() {
-	EDITOR=true dch --create --empty --newversion 1.0
+        VER=$1
+        [ -z "$VER" ] && VER=1.0
+	rm -f debian/changelog
+	EDITOR=true dch --create --empty --newversion $VER
 }
 
 git_init() {
@@ -22,18 +30,32 @@ sep_git_init() {
 	popd > /dev/null
 }
 
+git_tag() {
+	(
+        VER=$1
+        [ -z "$VER" ] && VER=1.0
+	git tag debian/$(echo $VER | sed 's/:/%/')
+	) > /dev/null
+}
+
 git_fill() {
 	(
-	echo hello > foo.txt
+	echo hello$1 > foo.txt
 	git add foo.txt
-	git commit -m "hello"
-	git tag debian/1.0
+	git commit -m "hello $1"
 	) > /dev/null
+}
+
+sep_git_tag() {
+	VER=$1
+	pushd sepgit > /dev/null
+	git_tag $VER
+	popd > /dev/null
 }
 
 sep_git_fill() {
 	pushd sepgit > /dev/null
-	git_fill
+	git_fill $1
 	popd > /dev/null
 }
 
@@ -88,13 +110,59 @@ testGbpSeperatedDirDoesNotExist() {
 }
 
 testGbpSeperatedDirVanillaTag() {
-	create_dch
 	sep_git_init
+	create_dch
 	sep_git_fill
+	sep_git_tag
 	assertTrue "Simple GBP run failed" run_dch
 }
 
+version_test() {
+	local TEST_VER=$1
 
+	#run_dch
+	assertTrue "Test version $TEST_VER GBP run failed" run_dch
+	assertEquals $TEST_VER $(get_version | sed 's/\(.*\+g\).*/\1/g' )
+}
+
+full_version_test() {
+	local TEST_VER="$1"
+
+	export GBP_GIT_DIR=$TESTBED/sepgit
+
+	sep_git_init
+	create_dch $TEST_VER
+	sep_git_fill
+	sep_git_tag $TEST_VER
+
+	version_test $TEST_VER
+
+	sep_git_fill "A"
+	create_dch $TEST_VER
+	version_test "$TEST_VER+1+g"
+
+	sep_git_fill "B"
+	sep_git_fill "C"
+	create_dch $TEST_VER
+	version_test "$TEST_VER+3+g"
+}
+
+
+testEpochNative() {
+	full_version_test "1:2.3"
+}
+
+testEpochNonNative() {
+	full_version_test "1:2.3-0vyatta3"
+}
+
+testNonNative() {
+	full_version_test "2.3-0vyatta3"
+}
+
+testNative() {
+	full_version_test "2.3"
+}
 
 TESTROOT=$(pwd)
 	
