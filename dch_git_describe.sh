@@ -29,6 +29,8 @@ VERSION=$(dpkg-parsechangelog | grep -E '^Version:' | awk '{ print $2 }')
 GIT_CMD="git"
 [ -n "$GBP_GIT_DIR" ] && GIT_CMD="$GIT_CMD --git-dir $GBP_GIT_DIR" 
 
+$GIT_CMD status &> /dev/null || exit 1
+
 # Get the epoch from current changelog entry.
 # git-buildpackage git tags doesn't hold the epoch.
 EPOCH=$( echo $VERSION | sed 's/^\([0-9]*:\).*/\1/g' )
