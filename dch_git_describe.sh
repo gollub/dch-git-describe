@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Set a `git describe` like version for the latest changelog entry
-# Copyright (C) 2014 Daniel Gollub
+# Copyright (C) 2014-2015 Daniel Gollub
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
