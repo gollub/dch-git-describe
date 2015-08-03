@@ -3,7 +3,7 @@
 TESTBED=""
 
 run_dch() {
-	/bin/bash $TESTROOT/../dch_git_describe.sh
+	/bin/bash $TESTROOT/../dch_git_describe
 }
 
 create_dch() {
