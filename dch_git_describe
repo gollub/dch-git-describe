@@ -41,7 +41,7 @@ fi
 $GIT_CMD describe --tags --match "debian/*"
 GIT_DESCRIBE=$( $GIT_CMD describe --tags --match "debian/*" | 
                 sed 's,debian/,,' |
-                sed 's/\(.*\)-\(.*\)-\(.*\)$/\1+\2+\3/g' |
+                sed 's/\(.*\)-\(.*\)-\(g.*\)$/\1+\2+\3/g' |
                 sed 's/^[0-9]*%//' |
                 sed 's/_/~/g' )
 

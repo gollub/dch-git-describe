@@ -173,6 +173,18 @@ testBZR() {
 	full_version_test "0.7.6~bzr1022-0vyatta1"
 }
 
+testTooMayHypehn() {
+	full_version_test "2:9.4.6-1770165-2vyatta5"
+}
+
+testTooMayHypehn2() {
+	full_version_test "3.4-10-0vyatta16"
+}
+
+testDebUbdate() {
+	full_version_test "4.5.2-1.5+deb7u7vyatta2"
+}
+
 TESTROOT=$(pwd)
 	
 echo "Running tests:"
