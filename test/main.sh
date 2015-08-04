@@ -11,17 +11,11 @@ run_dch() {
 	/bin/bash -x $TESTROOT/../dch_git_describe
 }
 
-create_unreleased_dch() {
+create_dch() {
         VER=$1
         [ -z "$VER" ] && VER=1.0
 	rm -f debian/changelog
 	EDITOR=true dch --create --empty --newversion $VER
-}
-
-create_dch() {
-	VER=$1
-	create_unreleased_dch $VER
-	sed -i 's/UNRELEASED/unstable/g' debian/changelog
 }
 
 git_init() {
@@ -189,28 +183,6 @@ testTooMayHypehn2() {
 
 testDebUbdate() {
 	full_version_test "4.5.2-1.5+deb7u7vyatta2"
-}
-
-testUnreleased() {
-	export GBP_GIT_DIR=$TESTBED/sepgit
-
-	local TEST_VER="1.0"
-
-	sep_git_init
-	create_unreleased_dch $TEST_VER
-	sep_git_fill
-	sep_git_tag $TEST_VER
-
-	version_test "$TEST_VER~0"
-
-	sep_git_fill "A"
-	create_unreleased_dch $TEST_VER
-	version_test "$TEST_VER~0"
-
-	sep_git_fill "B"
-	sep_git_fill "C"
-	create_unreleased_dch $TEST_VER
-	version_test "$TEST_VER~0"
 }
 
 TESTROOT=$(pwd)
