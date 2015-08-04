@@ -48,7 +48,8 @@ GIT_DESCRIBE=$( $GIT_CMD describe --tags --match "debian/*" --long |
 if [ -n "${GIT_DESCRIBE}" ]; then
 	NEW_VERSION="${EPOCH}${GIT_DESCRIBE}"
 else
-	NEW_VERSION="${VERSION}+$(date +%s)"
+	TIMESTAMP=$($GIT_CMD log -1 --pretty=format:%ct)
+	NEW_VERSION="${VERSION}+${TIMESTAMP}"
 fi
 
 sed -i "s/${PACKAGE} (${VERSION})/${PACKAGE} (${NEW_VERSION})/" \
