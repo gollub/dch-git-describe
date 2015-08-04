@@ -136,7 +136,7 @@ full_version_test() {
 	sep_git_fill
 	sep_git_tag $TEST_VER
 
-	version_test $TEST_VER
+	version_test "$TEST_VER+0+g"
 
 	sep_git_fill "A"
 	create_dch $TEST_VER

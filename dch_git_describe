@@ -39,7 +39,7 @@ if echo $VERSION | grep -Eq '^[0-9]+:.*'; then
 fi
 
 $GIT_CMD describe --tags --match "debian/*"
-GIT_DESCRIBE=$( $GIT_CMD describe --tags --match "debian/*" | 
+GIT_DESCRIBE=$( $GIT_CMD describe --tags --match "debian/*" --long |
                 sed 's,debian/,,' |
                 sed 's/\(.*\)-\(.*\)-\(g.*\)$/\1+\2+\3/g' |
                 sed 's/^[0-9]*%//' |
