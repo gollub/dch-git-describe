@@ -24,7 +24,7 @@ git_init() {
 
 sep_git_init() {
 	export GBP_GIT_DIR=$TESTBED/sepgit/.git
-	mkdir sepgit
+	mkdir -p sepgit
 	pushd sepgit > /dev/null
 	git_init
 	popd > /dev/null
@@ -34,7 +34,7 @@ git_tag() {
 	(
         VER=$1
         [ -z "$VER" ] && VER=1.0
-	git tag debian/$(echo $VER | sed 's/:/%/')
+	git tag debian/$(echo $VER | sed 's/:/%/' | sed 's/~/_/g')
 	) > /dev/null
 }
 
@@ -121,8 +121,9 @@ version_test() {
 	local TEST_VER=$1
 
 	#run_dch
+	#head -n1 debian/changelog
 	assertTrue "Test version $TEST_VER GBP run failed" run_dch
-	assertEquals $TEST_VER $(get_version | sed 's/\(.*\+g\).*/\1/g' )
+	assertEquals $TEST_VER $(get_version | sed 's/\(.*+g\).*/\1/g' )
 }
 
 full_version_test() {
@@ -162,6 +163,10 @@ testNonNative() {
 
 testNative() {
 	full_version_test "2.3"
+}
+
+testDFSG() {
+	full_version_test "5.7.2.1~dfsg-7+vyatta3"
 }
 
 TESTROOT=$(pwd)
