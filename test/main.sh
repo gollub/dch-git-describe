@@ -169,6 +169,10 @@ testDFSG() {
 	full_version_test "5.7.2.1~dfsg-7+vyatta3"
 }
 
+testBZR() {
+	full_version_test "0.7.6~bzr1022-0vyatta1"
+}
+
 TESTROOT=$(pwd)
 	
 echo "Running tests:"
