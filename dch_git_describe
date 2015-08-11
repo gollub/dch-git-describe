@@ -43,6 +43,7 @@ fi
 
 PACKAGE=$(dpkg-parsechangelog | grep -E '^Source:'  | awk '{ print $2 }')
 VERSION=$(dpkg-parsechangelog | grep -E '^Version:' | awk '{ print $2 }')
+DIST=$(dpkg-parsechangelog | grep -E '^Distribution:' | awk '{ print $NF }')
 
 [ -z "$PACKAGE" ] && [ -z "$VERSION" ] && exit 1
 
@@ -65,7 +66,9 @@ GIT_DESCRIBE=$( $GIT_CMD describe --tags --match "debian/*" --long |
                 sed 's/^[0-9]*%//' |
                 sed 's/_/~/g' )
 
-if [ -n "${GIT_DESCRIBE}" ]; then
+if [ "${DIST}" = "UNRELEASED" ]; then
+	NEW_VERSION="${VERSION}~0"
+elif [ -n "${GIT_DESCRIBE}" ]; then
 	NEW_VERSION="${EPOCH}${GIT_DESCRIBE}"
 else
 	TIMESTAMP=$($GIT_CMD log -1 --pretty=format:%ct)
