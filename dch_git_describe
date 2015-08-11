@@ -66,12 +66,14 @@ GIT_DESCRIBE=$( $GIT_CMD describe --tags --match "debian/*" --long |
                 sed 's/^[0-9]*%//' |
                 sed 's/_/~/g' )
 
+TIMESTAMP=$($GIT_CMD log -1 --pretty=format:%ct)
+
 if [ "${DIST}" = "UNRELEASED" ]; then
-	NEW_VERSION="${VERSION}~0"
+	GIT_ABBREV_HASH=$( $GIT_CMD log -1 --pretty=format:%h )
+	NEW_VERSION="${VERSION}~0+${TIMESTAMP}+g${GIT_ABBREV_HASH}"
 elif [ -n "${GIT_DESCRIBE}" ]; then
 	NEW_VERSION="${EPOCH}${GIT_DESCRIBE}"
 else
-	TIMESTAMP=$($GIT_CMD log -1 --pretty=format:%ct)
 	NEW_VERSION="${VERSION}+${TIMESTAMP}"
 fi
 

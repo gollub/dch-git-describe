@@ -201,16 +201,19 @@ testUnreleased() {
 	sep_git_fill
 	sep_git_tag $TEST_VER
 
-	version_test "$TEST_VER~0"
+	TIMESTAMP=$(git --git-dir $GBP_GIT_DIR log -1 --pretty=format:%ct)
+	version_test "$TEST_VER~0+${TIMESTAMP}+g"
 
 	sep_git_fill "A"
 	create_unreleased_dch $TEST_VER
-	version_test "$TEST_VER~0"
+	TIMESTAMP=$(git --git-dir $GBP_GIT_DIR log -1 --pretty=format:%ct)
+	version_test "$TEST_VER~0+${TIMESTAMP}+g"
 
 	sep_git_fill "B"
 	sep_git_fill "C"
 	create_unreleased_dch $TEST_VER
-	version_test "$TEST_VER~0"
+	TIMESTAMP=$(git --git-dir $GBP_GIT_DIR log -1 --pretty=format:%ct)
+	version_test "$TEST_VER~0+${TIMESTAMP}+g"
 }
 
 TESTROOT=$(pwd)
