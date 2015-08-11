@@ -17,9 +17,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+DSC_TAG_ID="XBS-Git-Id"
+DSC_TAG_URL="XS-Git-Url"
+
+source /etc/dch_git_describe.conf 2> /dev/null || true
 
 [ ! -f debian/changelog ] && exit 1
 [ ! -d .git ] && [ -z "$GBP_GIT_DIR" ] && [ -z "$GIT_DIR" ] && exit 1
+
+#
+# Write GIT commit information to debian/control
+#
+GIT_COMMIT_ID=$(git --git-dir $GBP_GIT_DIR log -1 --pretty=format:%H)
+GIT_REMOTE_URL=$(git --git-dir $GBP_GIT_DIR config remote.origin.url)
+if [ -f debian/control ] ; then
+    sed -i "0,/^\s*$/s//${DSC_TAG_ID}: ${GIT_COMMIT_ID}\n/" \
+       debian/control
+    sed -i "0,/^\s*$/s##${DSC_TAG_URL}: ${GIT_REMOTE_URL}\n#" \
+       debian/control
+fi
 
 PACKAGE=$(dpkg-parsechangelog | grep -E '^Source:'  | awk '{ print $2 }')
 VERSION=$(dpkg-parsechangelog | grep -E '^Version:' | awk '{ print $2 }')
