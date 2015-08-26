@@ -55,7 +55,9 @@ $GIT_CMD log -1 &> /dev/null || exit 1
 # Get the epoch from current changelog entry.
 # git-buildpackage git tags doesn't hold the epoch.
 EPOCH=""
-if echo $VERSION | grep -Eq '^[0-9]+:.*'; then
+if [ -n "$DCH_GIT_DESCRIBE_EPOCH" ]; then
+	EPOCH=$DCH_GIT_DESCRIBE_EPOCH
+elif echo $VERSION | grep -Eq '^[0-9]+:.*'; then
 	EPOCH=$( echo $VERSION | sed 's/^\([0-9]*:\).*/\1/g' )
 fi
 
