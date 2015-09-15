@@ -13,14 +13,16 @@ run_dch() {
 
 create_unreleased_dch() {
         VER=$1
+        PACKAGE=$2
         [ -z "$VER" ] && VER=1.0
 	rm -f debian/changelog
-	EDITOR=true dch --create --empty --newversion $VER
+	EDITOR=true dch --create --empty --newversion $VER --package "$PACKAGE"
 }
 
 create_dch() {
 	VER=$1
-	create_unreleased_dch $VER
+	PACKAGE=$2
+	create_unreleased_dch $VER $PACKAGE
 	sed -i 's/UNRELEASED/unstable/g' debian/changelog
 }
 
@@ -190,6 +192,32 @@ testTooMayHypehn2() {
 testDebUbdate() {
 	full_version_test "4.5.2-1.5+deb7u7vyatta2"
 }
+
+testPkgNameInTag() {
+	local TEST_VER="2.4+dfsg-1a"
+
+	export GBP_GIT_DIR=$TESTBED/sepgit
+
+	sep_git_init
+	create_dch $TEST_VER "qemu"
+	sep_git_fill
+
+	pushd sepgit > /dev/null
+	git tag "debian/qemu_"$(echo $TEST_VER | sed 's/:/%/' | sed 's/~/_/g')
+	popd > /dev/null
+
+	version_test "$TEST_VER+0+g"
+
+	sep_git_fill "A"
+	create_dch $TEST_VER "qemu"
+	version_test "$TEST_VER+1+g"
+
+	sep_git_fill "B"
+	sep_git_fill "C"
+	create_dch $TEST_VER "qemu"
+	version_test "$TEST_VER+3+g"
+}
+
 
 testUnreleased() {
 	export GBP_GIT_DIR=$TESTBED/sepgit
