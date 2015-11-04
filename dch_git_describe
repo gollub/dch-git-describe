@@ -18,8 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 DSC_TAG_ID="XBS-Git-Id"
-DSC_TAG_URL="XS-Git-Url"
-DSC_TAG_BRANCH="XS-Git-Branch"
+DSC_TAG_BRANCH="XS-Git-Repo"
 
 source /etc/dch_git_describe.conf 2> /dev/null || true
 
@@ -31,13 +30,11 @@ source /etc/dch_git_describe.conf 2> /dev/null || true
 #
 GIT_COMMIT_ID=$(git --git-dir $GBP_GIT_DIR log -1 --pretty=format:%H)
 GIT_REMOTE_URL=$(git --git-dir $GBP_GIT_DIR config remote.origin.url)
-GIT_BRANCH=$(git --git-dir $GBP_GIT_DIR rev-parse --abbrev-ref HEAD)
+GIT_REPO=$( echo $GIT_REMOTE_URL | sed -e 's/ssh:\/\///g' -e 's,^[^\/]*/,,' )
 if [ -f debian/control ] ; then
     sed -i "0,/^\s*$/s//${DSC_TAG_ID}: ${GIT_COMMIT_ID}\n/" \
        debian/control
-    sed -i "0,/^\s*$/s##${DSC_TAG_URL}: ${GIT_REMOTE_URL}\n#" \
-       debian/control
-    sed -i "0,/^\s*$/s##${DSC_TAG_BRANCH}: ${GIT_BRANCH}\n#" \
+    sed -i "0,/^\s*$/s##${DSC_TAG_REPO}: ${GIT_REPO}\n#" \
        debian/control
 fi
 
